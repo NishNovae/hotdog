@@ -10,8 +10,8 @@ dependencies = [
     "uvicorn>=0.30.6",
     "transformers==4.44.2",
     "torch>=2.4.1",
-    "pillow>=10.4.0",
-    "python-multipart>=0.0.10",
+    "torchvision>=0.19.1",
+    "nvidia-curand-cu12>=10.3.2.106",
 ]
 requires-python = ">=3.11"
 readme = "README.md"
