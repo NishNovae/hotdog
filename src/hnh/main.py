@@ -1,24 +1,34 @@
 # src/hnh/main.py
 
 import random
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, Request
+from fastapi.templating import Jinja2Templates
+from transformers import pipeline
+from PIL import Image
+import numpy as np
+import io
+
+from src.hnh.util import summary
 
 app = FastAPI()
+model_name = "julien-c/hotdog-not-hotdog"
+#html = Jinja2Templates(directory="pbulic")
 
 @app.get("/hello")
 def read_root():
     return { "Hello": "World!" }
 
-@app.get("/")
-async def home(request: Request):
-    hotdog = "https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQweb_7o7OrtlTP75oX2Q_keaoVYgAhMsYVp1sCafoNEdtSSaHps3n7NtNZwT_ufZGPyH7_9MFcao_r8QWr3Fdz17RitvZXLTU4dNsxr73m6V1scsH3_ZZHRw&usqp=CAE"
+@app.post("/predict/")
+async def hotdog(file: UploadFile):
+    try:
+        img = await file.read()
+        model = pipeline("image-classification", model=model_name)
+        img = Image.open(io.BytesIO(img))
 
-    dog = "https://hearingsense.com.au/wp-content/uploads/2022/01/8-Fun-Facts-About-Your-Dog-s-Ears-1024x512.webp"
+        pred = model(img)
+        return summary(file.filename, pred)
+        #return { "filename": file.filename, "This seems to be...": pred }
 
-    image_url = random.choice([hotdog, dog])
-    return html.TemplateResponse("index.html",{"request":request, "image_url": image_url})
+    except Exception as e:
+        return { "error": str(e) }
 
-
-@app.get("/predict")
-def hotdog():
-    return { "Implemented?": "False", "Hotdog": random.choice(["True", "False"])
