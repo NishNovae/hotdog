@@ -5,12 +5,13 @@ from fastapi import FastAPI, File, UploadFile
 
 app = FastAPI()
 
-@app.post("/")
+@app.get("/")
 def read_root():
     return { "Hello": "World!" }
 
-@app.post("/hotdog")
+@app.get("/hotdog")
 def is_hotdog():
     # dummy!
     hotdog = random.choice(["True", "False"])
-    return { "dummy": "code", "hotdog": hotdog }
+
+    return { "is_dummy_code": "True", "hotdog?": hotdog }
